@@ -1,0 +1,163 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+</head>
+<body onload="loadApp()">
+
+
+	<div id="divLogin" align="center">
+		<div><input id="user" type="text" value="PHUHOI"></input> </div>
+		<div><input id="pass" type="password" value="abc"></input></div>
+		<div><button id="btnLogin">LOGIN</button></div>
+		
+	</div>
+	<div id="divSW1" align="center">
+		<button id="btnSW1">CT1</button>
+		<button id="btnSW11" >1</button>
+		<button id="btnSW12" >2</button>
+		<button id="btnSW13" >3</button>		
+	</div>
+	<div id="divSW2" align="center">
+		<button id="btnSW2">CT2</button>
+		<button id="btnSW21" >1</button>
+		<button id="btnSW22" >2</button>
+		<button id="btnSW23" >3</button>		
+	</div>
+	
+	<div  align="center"><p></p></div>
+	
+	<script src="https://www.gstatic.com/firebasejs/5.5.4/firebase.js"></script>
+	<script>
+		// Initialize Firebase
+		var config = {
+			apiKey: "AIzaSyCMBqgRP3tRc5mZUaOLLePwTLb8enzw-zE",
+			authDomain: "arduinocontrolllight.firebaseapp.com",
+			databaseURL: "https://arduinocontrolllight.firebaseio.com",
+			projectId: "arduinocontrolllight",
+			storageBucket: "arduinocontrolllight.appspot.com",
+			messagingSenderId: "743068766248"
+		};
+		firebase.initializeApp(config);
+		var db = firebase.database();		
+		var sw11="0",sw12="0",sw13="0";		
+		var sw21="0",sw22="0",sw23="0";	
+		var path="";
+		
+		$('#btnLogin').click(function(){	
+			check_internet();
+			var txtPass=$('#pass').val();
+			path=$('#user').val()+"/F1";
+			if(path.length>3){				
+				var dbload=db.ref().child(path);				
+				dbload.on('value', function(snapshot){
+					var pass=snapshot.child("Pass").val();
+					if(pass==txtPass){		
+						$('#divLogin').hide();						
+											
+						var swNum=snapshot.child("SW").val();
+						
+						if(swNum.indexOf("1")>=0){
+							sw11=snapshot.child("11").val();
+							sw12=snapshot.child("12").val();
+							sw13=snapshot.child("13").val();						
+							sw11=="1" ? $('#btnSW11').css("color","red") : $('#btnSW11').css("color","");
+							sw12=="1" ? $('#btnSW12').css("color","red") : $('#btnSW12').css("color","");
+							sw13=="1" ? $('#btnSW13').css("color","red") : $('#btnSW13').css("color","");
+							$('#divSW1').show();	
+						}else{$('#divSW1').hide();}
+						
+						if(swNum.indexOf("2")>=0){
+							sw21=snapshot.child("21").val();
+							sw22=snapshot.child("22").val();
+							sw23=snapshot.child("23").val();						
+							sw21=="1" ? $('#btnSW21').css("color","red") : $('#btnSW21').css("color","");
+							sw22=="1" ? $('#btnSW22').css("color","red") : $('#btnSW22').css("color","");
+							sw23=="1" ? $('#btnSW23').css("color","red") : $('#btnSW23').css("color","");
+							$('#divSW2').show();	
+						}else{$('#divSW2').hide();}	
+						
+					}else{
+						$('p').html("Sai mat khau!");						
+					}
+				})//dbload
+			}//end if
+			else{
+				$('p').html("Chua nhap mat khau!");	
+			}
+		});
+		
+		$('#btnSW11').click(function(){ 
+			if(!check_internet()){return;}
+			sw11=sw11=="0"?"1":"0";			
+			db.ref().child(path+"/11").set(sw11);					
+		});
+		$('#btnSW12').click(function(){ 	
+			if(!check_internet()){return;}
+			sw12=sw12=="0"?"1":"0";			
+			db.ref().child(path+"/12").set(sw12);						
+		});
+		$('#btnSW13').click(function(){ 
+			if(!check_internet()){return;}	
+			sw13=sw13=="0"?"1":"0";			
+			db.ref().child(path+"/13").set(sw13);			
+		});
+		
+			
+		$('#btnSW21').click(function(){ 
+			if(!check_internet()){return;}
+			sw21=sw21=="0"?"1":"0";			
+			db.ref().child(path+"/21").set(sw21);			
+		});
+		$('#btnSW22').click(function(){
+			if(!check_internet()){return;}		
+			sw22=sw22=="0"?"1":"0";			
+			db.ref().child(path+"/22").set(sw22);			
+		});
+		$('#btnSW23').click(function(){ 
+			if(!check_internet()){return;}
+			sw23=sw23=="0"?"1":"0";			
+			db.ref().child(path+"/23").set(sw23);			
+		});
+		
+		
+		$('#btnSW2').click(function(){ 
+			if(!check_internet()){return;}					
+			db.ref().child().remove();			
+		});
+		function check_internet(){
+			if(!navigator.onLine){
+				$('p').html("Kiem tra wifi/3G/internet!");
+				return false;
+			}
+			else{
+				$('p').html("");
+				return true;
+			}	
+		}
+		
+		function loadApp(){
+			check_internet();
+			var w="24%",h="60px";
+			$('#btnLogin').css("height","40");$('#btnLogin').css("width","30%");	
+			$('#user').css("height","40px");$('#user').css("width","100%");	
+			$('#pass').css("height","40px");$('#pass').css("width","100%");
+			
+			$('#divSW1').hide();
+			$('#btnSW11').css("height",h);$('#btnSW11').css("width",w);				
+			$('#btnSW12').css("height",h);$('#btnSW12').css("width",w);				
+			$('#btnSW13').css("height",h);$('#btnSW13').css("width",w);	
+			$('#btnSW1').css("height",h);$('#btnSW1').css("width",w);	
+			
+			$('#divSW2').hide();
+			$('#btnSW21').css("height",h);$('#btnSW21').css("width",w);				
+			$('#btnSW22').css("height",h);$('#btnSW22').css("width",w);				
+			$('#btnSW23').css("height",h);$('#btnSW23').css("width",w);	
+			$('#btnSW2').css("height",h);$('#btnSW2').css("width",w);		
+		}
+	</script>
+
+</body>
+</html>
